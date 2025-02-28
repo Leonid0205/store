@@ -5,7 +5,7 @@ const ProductList = ({
   data,
   title,
   limit,
-}: {
+}: { 
   data: Product[];
   title?: string;
   limit?: number;
