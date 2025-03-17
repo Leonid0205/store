@@ -4,26 +4,24 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/db/prisma";
 import { compareSync } from "bcrypt-ts-edge";
 import type { NextAuthConfig } from "next-auth";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export const config = {
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/auth/sign-in",
+    error: "/auth/sign-in",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60,
   },
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "Email" },
-        password: {
-          label: "Password",
-          type: "password",
-          placeholder: "Password",
-        },
+        email: { type: "email" },
+        password: { type: "password" },
       },
       async authorize(credentials) {
         if (credentials == null) return null;
@@ -36,7 +34,7 @@ export const config = {
         });
 
         if (user && user.password) {
-          const isMatch = await compareSync(
+          const isMatch =  compareSync(
             credentials.password as string,
             user.password
           );
@@ -57,10 +55,45 @@ export const config = {
   callbacks: {
     async session({ session, user, trigger, token }: any) {
       session.user.id = token.sub;
+      session.user.role = token.role;
+      session.user.name = token.name;
       if (trigger === "update") {
         session.user.name = user.name;
       }
       return session;
+    },
+    async jwt({ token, user, trigger, session }: any) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        if (user.name === "NO_NAME") {
+          token.name = user.email.split("@")[0];
+        }
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            name: token.name,
+          },
+        });
+      }
+      return token;
+    },
+    authorized({ request, auth }: any) {
+      if (!request.cookies.get("sessionCartId")) {
+        const sessionCartId = crypto.randomUUID();
+        const newRequestHeaders = new Headers(request.headers);
+        const response = NextResponse.next({
+          request: {
+            headers: newRequestHeaders,
+          },
+        });
+        response.cookies.set("sessionCartId", sessionCartId);
+        return response;
+      } else {
+        return true;
+      }
     },
   },
 } satisfies NextAuthConfig;
