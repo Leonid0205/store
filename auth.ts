@@ -9,8 +9,8 @@ import { NextResponse } from "next/server";
 
 export const config = {
   pages: {
-    signIn: "/auth/sign-in",
-    error: "/auth/sign-in",
+    signIn: "/sign-in",
+    error: "/sign-in",
   },
   session: {
     strategy: "jwt" as const,
@@ -34,7 +34,7 @@ export const config = {
         });
 
         if (user && user.password) {
-          const isMatch =  compareSync(
+          const isMatch = compareSync(
             credentials.password as string,
             user.password
           );
@@ -77,10 +77,44 @@ export const config = {
             name: token.name,
           },
         });
+        if (trigger === "signIn" || trigger === "signUp") {
+          const cookiesObject = await cookies();
+          const sessionCartId = cookiesObject.get("sessionCartId")?.value;
+          if (sessionCartId) {
+            const sessionCart = await prisma.cart.findFirst({
+              where: { sessionCartId },
+            });
+            if (sessionCart) {
+              await prisma.cart.deleteMany({
+                where: { userId: user.id },
+              });
+              await prisma.cart.update({
+                where: { id: sessionCart.id },
+                data: { userId: user.id },
+              });
+            }
+          }
+        }
+      }
+      if (session?.user.name && trigger === "update") {
+        token.name = session.user.name;
       }
       return token;
     },
     authorized({ request, auth }: any) {
+      const protecedPath = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/users\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/,
+      ];
+      const { pathname } = request.nextUrl;
+      if (!auth && protecedPath.some((p) => p.test(pathname))) {
+        return false;
+      }
       if (!request.cookies.get("sessionCartId")) {
         const sessionCartId = crypto.randomUUID();
         const newRequestHeaders = new Headers(request.headers);
