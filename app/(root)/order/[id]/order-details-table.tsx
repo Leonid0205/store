@@ -28,7 +28,7 @@ const OrderDetailsTable = ({ order }: { order: Order }) => {
     isDelivered,
     isPaid,
     paidAt,
-    delverdAt,
+    deliveredAt,
   } = order;
   return (
     <>
