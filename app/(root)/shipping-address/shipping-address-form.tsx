@@ -22,7 +22,7 @@ import { ArrowRight, Loader } from "lucide-react";
 import { updateUserAddress } from "@/lib/actions/user.actions";
 import { toast } from "sonner";
 
-const ShippingAdressForm = ({ address }: { address: ShippingAddress }) => {
+const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof shippingAddressSchema>>({
@@ -186,4 +186,4 @@ const ShippingAdressForm = ({ address }: { address: ShippingAddress }) => {
   );
 };
 
-export default ShippingAdressForm;
+export default ShippingAddressForm;
