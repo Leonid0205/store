@@ -5,8 +5,15 @@ import { PAYMENT_METHODS } from "./constants";
 
 // Schema for inserting products
 
+// const currency = z
+//   .union([z.string(), z.instanceof(Prisma.Decimal)])
+//   .refine(
+//     (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
+//     "Price must have exactly two decimal places"
+//   );
+
 const currency = z
-  .union([z.string(), z.instanceof(Prisma.Decimal)])
+  .string()
   .refine(
     (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
     "Price must have exactly two decimal places"
@@ -102,4 +109,20 @@ export const insertOrderItemSchema = z.object({
   name: z.string(),
   price: currency,
   qty: z.number(),
+});
+
+export const paymentResultSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  email_address: z.string(),
+  pricePaid: z.string(),
+});
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(3, "Name musb be at least three characters"),
+  email: z.string().min(3, "Email musb be at least three characters"),
+});
+
+export const updateProductSchema = insertProductSchema.extend({
+  id: z.string().min(1, "Id is required").optional(),
 });
