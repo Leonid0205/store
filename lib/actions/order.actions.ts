@@ -253,7 +253,7 @@ export async function getMyOrders({
   }
   const data = await prisma.order.findMany({
     where: {
-      userId: session?.user?.id!,
+      userId: session?.user?.id,
     },
     orderBy: {
       createdAt: "desc",
@@ -262,7 +262,7 @@ export async function getMyOrders({
     skip: (page - 1) * limit,
   });
   const dataCount = await prisma.order.count({
-    where: { userId: session?.user?.id! },
+    where: { userId: session?.user?.id },
   });
   return { data, totalPages: Math.ceil(dataCount / limit) };
 }
