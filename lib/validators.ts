@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
-import { Prisma } from "@prisma/client";
 import { PAYMENT_METHODS } from "./constants";
 
 // Schema for inserting products
@@ -125,4 +124,9 @@ export const updateProfileSchema = z.object({
 
 export const updateProductSchema = insertProductSchema.extend({
   id: z.string().min(1, "Id is required").optional(),
+});
+
+export const updateUserSchema = updateProfileSchema.extend({
+  id: z.string().min(1, "ID is required"),
+  role: z.string().min(1, "Role is required"),
 });

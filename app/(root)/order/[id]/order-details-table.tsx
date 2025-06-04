@@ -28,7 +28,6 @@ import {
 } from "@/lib/actions/order.actions";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { Divide } from "lucide-react";
 
 const OrderDetailsTable = ({
   order,
@@ -51,7 +50,7 @@ const OrderDetailsTable = ({
     isDelivered,
     isPaid,
     paidAt,
-    deliveredAt,
+    // deliveredAt,
   } = order;
   const PrintLoadingState = () => {
     const [{ isPending, isRejected }] = usePayPalScriptReducer();

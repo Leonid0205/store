@@ -10,25 +10,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { deleteProduct, getAllProducts } from "@/lib/actions/product.actions";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatId } from "@/lib/utils";
 import Link from "next/link";
 
 const AdminProductsPage = async (props: {
-  searchParams: Promise<{ page: string; query: string; category: string }>;
+  searchParams: Promise<{
+    page: string;
+    query: string;
+    category?: string;
+  }>;
 }) => {
   const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const searchText = searchParams.query || "";
-  const category = searchParams.category || "";
   const products = await getAllProducts({
     query: searchText,
     page,
-    category,
   });
   return (
     <div className="space-y-2 ">
       <div className="flex-between">
-        <h1 className="h2-bold">Products</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="h2-bold">Products</h1>
+          {searchText && (
+            <div>
+              Filtered by <i className="mr-2">&quot;{searchText}&quot;</i>{" "}
+              <Link href="/admin/products">
+                <Button variant="outline" size="sm">
+                  Remove Filter
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
         <Button asChild variant="default">
           <Link href="/admin/products/create">Create Product</Link>
         </Button>
@@ -48,7 +62,7 @@ const AdminProductsPage = async (props: {
         <TableBody>
           {products.data.map((product) => (
             <TableRow key={product.id}>
-              <TableCell>{product.id}</TableCell>
+              <TableCell>{formatId(product.id)}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell className="text-right">
                 {formatCurrency(product.price)}
