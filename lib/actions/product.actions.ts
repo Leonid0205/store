@@ -7,7 +7,6 @@ import { revalidatePath } from "next/cache";
 import { insertProductSchema, updateProductSchema } from "../validators";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
-import { get } from "http";
 
 export async function getLatestProducts() {
   const data = await prisma.product.findMany({
