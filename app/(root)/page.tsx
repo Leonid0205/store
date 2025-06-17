@@ -1,5 +1,10 @@
+import ProductCarousel from "@/components/shared/product/product-carousel";
 import ProductList from "@/components/shared/product/product-list";
-import { getLatestProducts } from "@/lib/actions/product.actions";
+import VeiwAllProductsButton from "@/components/veiw-all-products-button";
+import {
+  getFeaturedProducts,
+  getLatestProducts,
+} from "@/lib/actions/product.actions";
 
 export const metadata = {
   title: "HomePage",
@@ -7,9 +12,18 @@ export const metadata = {
 
 const HomePage = async () => {
   const latestProducts = await getLatestProducts();
+  const feateredProcucts = await getFeaturedProducts();
   return (
     <>
-      <ProductList data={latestProducts} title="Newest arrivals" limit={4} />
+      {feateredProcucts.length > 0 && (
+        <ProductCarousel data={feateredProcucts} />
+      )}
+      <ProductList
+        data={latestProducts}
+        title="Newest arrivals"
+        limit={4}
+      />
+      <VeiwAllProductsButton />
     </>
   );
 };
