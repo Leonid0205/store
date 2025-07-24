@@ -33,7 +33,7 @@ const ProductCarousel = ({ data }: { data: Product[] }) => {
                 <div className="relative mx-auto">
                   {product.banner && (
                     <Image
-                      src={product.banner}
+                      src={"/" + product.banner!}
                       alt={product.name}
                       width={0}
                       height={0}
